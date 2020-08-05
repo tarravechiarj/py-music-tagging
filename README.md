@@ -14,3 +14,7 @@ Use the following to see more options:
 python parseTags.py -h
 python setTags.py -h 
 ```
+
+### Dependencies
+[Mutagen] (https://mutagen.readthedocs.io/en/latest/index.html)
+
