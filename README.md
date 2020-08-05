@@ -16,5 +16,6 @@ python setTags.py -h
 ```
 
 ### Dependencies
-[Mutagen] (https://mutagen.readthedocs.io/en/latest/index.html)
+[Mutagen](https://mutagen.readthedocs.io/en/latest/index.html)
+
 
