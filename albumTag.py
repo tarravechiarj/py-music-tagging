@@ -24,13 +24,13 @@ class AlbumTag(object):
             try:
                 return abs(int(x))
             except:
-                return str(x)
-
+                return str(x)                
+        
         def keyFilter(iterable, key, classinfo):
             return [x for x in iterable if isinstance(key(x), classinfo)]
 
         if not self.sorted:
-            disc = lambda t: sortKey(t.get('discnumber' ''))
+            disc = lambda t: sortKey(t.get('discnumber', ''))
             track = lambda t: sortKey(t.get('tracknumber', ''))
         
             intDiscs = keyFilter(self.tags, disc, int)
@@ -50,23 +50,19 @@ class AlbumTag(object):
     def updateTags(self, newTagInfo, validate=False):
         for tag in self.tags:
             tag.update(newTagInfo)
-        
         if 'discnumber' in newTagInfo or 'tracknumber' in newTagInfo:
             self.sorted = False
 
     def getTags(self, sort=True, validate=False):
         if sort:
             self.sortTags()
-        
         if validate:
             self.removeInvalidTags()
-
         for tag in self.tags:
             yield tag
 
     def removeInvalidTags(self):
         valid = EasyID3.valid_keys.keys()
-
         for tag in self.tags:
             for k in tag:
                 if k not in valid:
@@ -76,17 +72,14 @@ class AlbumTag(object):
     def dump(self, file, sort=True):
         if sort:
             self.sortTags()
-
         json.dump(self.data, file)
 
     def load(self, file, sort=False):
         self.data = json.load(file)
         self.sorted = self.data['sorted']
         self.tags = self.data['tags']
-
         if sort:
             self.sortTags()
-
 
 
 class SanitizedTags(AlbumTag):
@@ -94,28 +87,23 @@ class SanitizedTags(AlbumTag):
     def sanitize(self, tag):
         keys = ('discnumber', 'tracknumber')
         keyFormats = (lambda x: str(x), lambda x: '{:02}'.format(x))
-
         for key, keyFormat in zip(keys, keyFormats):
             if key not in tag:
                 continue
-            
             keyStr = str(tag[key])
-
             if keyStr.isdigit():
                 keynum = int(keyStr)
             elif len(keyStr) == 1 and keyStr.isalpha():
                 keynum = 1 + ord(keyStr.upper()) - ord('A')
             else:
                 keynum = 0
-            
             tag[key] = keyFormat(keynum)
 
     def flatten(self):
         if not self.tags:
             return
-        
-        self.sortTags()
 
+        self.sortTags()
         mindisc = tags[0].get('discnumber')
         currentdisc = mindisc
         addend = 0
@@ -140,19 +128,16 @@ class SanitizedTags(AlbumTag):
 
     def removeSingleDiscInfo(self):
         self.sortTags()
-
         if self.tags[0].get('discnumber') == self.tags[-1].get('discnumber'):
             for k in self.tags:
                 if 'discnumber' in k:
                     del k['discnumber']
 
-    def getTags(self, sort=True, validate=False, ):
+    def getTags(self, sort=True, validate=False):
         if sort:
             self.sortTags()
-        
         if validate:
             self.removeInvalidTags()
-
         for tag in self.tags:
             yield tag
 
@@ -160,9 +145,7 @@ class SanitizedTags(AlbumTag):
         self.data = json.load(file)
         self.sorted = self.data['sorted']
         self.tags = self.data['tags']
-
         for tag in tags:
             self.sanitize(tag)
-
         if sort:
             self.sortTags()
